@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 # stolen from imgcat: https://github.com/wookayin/python-imgcat/blob/master/setup.py
 
-import sys
 import os
 import re
-from setuptools import setup, Command
+import sys
+
+from setuptools import Command, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -58,7 +59,7 @@ tests_requires = [
     'pytest<5.0'
 ]
 
-__version__ = str(0.3)
+__version__ = str(0.4)+"plus"
 
 
 # brought from https://github.com/kennethreitz/setup.py
@@ -105,30 +106,29 @@ class DeployCommand(Command):
         sys.exit()
 
 setup(
-    name='gitlinks',
+    name='gitlinks-plus',
     version=__version__,
-    license='MIT',
+    license='GPLv3',
     description='GitHub pages-powered golinks',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/lengstrom/gitlinks',
-    author='Logan Engstrom',
-    author_email='engstrom@mit.com',
+    url='https://github.com/mehvix/gitlinks-plus',
+    author='Max Vogel; Original Author: Logan Engstrom',
+    author_email='max-v@berkeley.edu',
     keywords='golinks github pages',
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 3 - Alpha',
-        'License :: OSI Approved :: MIT License',
+        'Development Status :: 4 - Alpha',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
     ],
-    packages=['gitlinks'],
+    packages=['gitlinks-plus'],
     install_requires=install_requires,
     setup_requires=['pytest-runner<5.0'],
     tests_require=tests_requires,
     entry_points={
-        'console_scripts': ['gitlinks=gitlinks:main'],
+        'console_scripts': ['gitlinks-plus=gitlinks-plus:main'],
     },
     include_package_data=True,
     zip_safe=False,

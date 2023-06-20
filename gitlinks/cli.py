@@ -7,26 +7,27 @@ Usage:
   gitlinks set <key> <url>
   gitlinks delete <key> ...
   gitlinks show
+  gitlinks hide <key> ...
   gitlinks cname <CNAME>
 
 Options:
   -h --help     Show this screen.
 """
-from docopt import docopt
-from pathlib import Path
-import shutil
-import tabulate
 import json
+import shutil
+import sys
+from pathlib import Path
+
 import git
 import pandas as pd
-import sys
+import tabulate
+from docopt import docopt
 from ilock import ILock
 
-from .utils import (
-    clone, query_yes_no, try_setup, serialize_csv, load_csv, commit_push,
-    check_repo, generate_pages, plural_msg, clean, patch_url, reset_origin,
-    ARROW, bolded, pprint, try_state
-)
+from .utils import (ARROW, bolded, check_repo, clean, clone, commit_push,
+                    generate_pages, load_csv, patch_url, plural_msg, pprint,
+                    query_yes_no, reset_origin, serialize_csv, try_setup,
+                    try_state)
 
 GIT_PATH = Path('~/.gitlinks/').expanduser()
 INDEX_NAME = 'index.csv'
@@ -58,8 +59,10 @@ def set_link(key, url, df):
     url = patch_url(url)
     df = df[df.key != key]
     df = pd.concat([df, pd.DataFrame({
+        'date':[pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')],
         'key':[key],
-        'url':[url]
+        'url':[url],
+        'hide':[False],
     })], ignore_index=True, axis=0)
 
     return df
@@ -67,6 +70,11 @@ def set_link(key, url, df):
 def delete_links(keys, df):
     keys = set(keys)
     return df[~df.key.isin(keys)]
+
+def hide_links(keys, df):
+    keys = set(keys)
+    df.loc[df.key.isin(keys), 'hide'] = ~df.loc[df.key.isin(keys), 'hide']
+    return df
 
 def show(df, repo):
     df[ARROW] = [ARROW for _ in range(df.shape[0])]
@@ -140,6 +148,24 @@ def execute(args, git_path=GIT_PATH):
 
         if len(deletable) == 0:
             pprint('No keys to remove, exiting!')
+            return
+    elif args['hide']:
+        keys = args['<key>']
+        poss = set(df.key)
+        hideable = [k for k in keys if k in poss]
+        df = hide_links(hideable, df)
+
+        not_hideable = set(keys) - set(hideable)
+        if not_hideable:
+            msg = 'Key{plural} {keys_pretty} not present...'
+            pprint(plural_msg(not_hideable, msg))
+
+        msg = '(un)hid key{plural} {keys_pretty}'
+        print_msg = plural_msg(hideable, msg, bold=True)
+        commit_msg = plural_msg(hideable, msg, bold=False)
+
+        if len(hideable) == 0:
+            pprint('No keys to (un)hide, exiting!')
             return
 
     if args['cname']:

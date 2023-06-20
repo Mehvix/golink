@@ -1,27 +1,53 @@
-import git
-from collections import defaultdict
-from git import RemoteProgress
-import pandas as pd
+import json
 import shutil
 import sys
+from collections import defaultdict
 from pathlib import Path
+
+import git
+import pandas as pd
 import requests
-import json
+from git import RemoteProgress
 
 ARROW = '→'
 DEFAULT_PROTECTED = ['.git', 'CNAME']
-GA = """
-<!-- Google Analytics -->
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+# GA = """
+# <!-- Google Analytics -->
+# <script>
+# (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+# (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+# m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+# })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+# """
 
-ga('create', '{}', 'auto');
-ga('send', 'pageview');
-</script>
-<!-- End Google Analytics -->
+STYLE_CSS = """
+body {{
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica, Segoe UI, Arial, sans-serif;
+    padding: 24px;
+    line-height: 1.5;
+}}
+a {{ color: black }}
+td:nth-child(1) {{ text-align: left }}
+th  {{
+    cursor: row-resize;
+    text-align: left;
+}}
+"""
+
+# Source: https://stackoverflow.com/a/49041392
+SORT_JS = """
+const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {{
+    const table = th.closest('table');
+    Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+        .forEach(tr => table.appendChild(tr) );
+}})));
 """
 
 def try_state(git_path, meta_name):
@@ -37,8 +63,10 @@ def bolded(x):
 
 def empty_csv():
     return pd.DataFrame({
+        'date':[],
         'key':[],
-        'url':[]
+        'url':[],
+        'hide':[]
     })
 
 def serialize_csv(df, path):
@@ -126,10 +154,10 @@ def generate_pages(df, working_dir, index_name, state):
         cname = state['CNAME']
         with open(wd / cname, 'w+') as f:
             f.write(cname)
-    if 'GA Property ID' in state:
-        prop_id = state['GA Property ID']
-    else:
-        prop_id = None
+    # if 'GA Property ID' in state:
+    #     prop_id = state['GA Property ID']
+    # else:
+    #     prop_id = None
 
     protected = ['.git', index_name]
     wipe_directory(wd, protected)
@@ -138,32 +166,28 @@ def generate_pages(df, working_dir, index_name, state):
     iterator = df.sort_values('key').iterrows()
     inner_list = []
     for _, row in iterator:
-        key, url = row.key, row.url
+        key, url, hide, date = row.key, row.url, row.hide, row.date
         html_file = wd / (key + '/index.html')
         parent = html_file.parent
         parent.mkdir(exist_ok=True, parents=True)
 
         with open(html_file, 'w+') as f:
             f.write(template_maker(url))
-
-        inner_list.append(f'<tr><td><a href="{key}">{key}</a></td><td>{ARROW}</td><td><a href="{url}">{url}</a></td></li>')
+        if not hide:
+            inner_list.append(f'<tr><td>{date}</td><td><a href="{key}">{key}</a></td><td>{ARROW}</td><td><a href="{url}">{url}</a></td></li>\n')
 
     with open(wd / 'index.html', 'w+') as index_file:
-        html = (f'''
+        html = (f"""
 <title>gitlinks</title>
-<style>
-body {{
-    font-family: -apple-system, BlinkMacSystemFont, Helvetica, Segoe UI, Arial, sans-serif;
-    padding: 24px;
-    line-height: 1.5;
-}}
-a {{ color: black }}
-td:nth-child(1) {{ text-align: left }}
-</style>
-<h1>gitlinks</h1>
-<table><tbody>{"".join((inner_list))}</tbody></table>''')
-        if prop_id:
-            html = html + GA.format(prop_id)
+<style>{STYLE_CSS}</style>
+<script defer>{SORT_JS}</script>
+<h1>gitlinks plus</h1>
+<table><tbody>
+<tr><th>Date Updated</th><th>Key</th><th></th><th>URL</th></tr>
+{"".join((inner_list))}
+</tbody></table>""")
+        # if prop_id:
+        #     html = html + GA.format(prop_id)
 
         index_file.write(html)
 

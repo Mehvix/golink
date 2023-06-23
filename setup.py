@@ -106,16 +106,16 @@ class DeployCommand(Command):
         sys.exit()
 
 setup(
-    name='gitlinks-plus',
+    name='golink',
     version=__version__,
     license='GPLv3',
     description='GitHub pages-powered golinks',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/mehvix/gitlinks-plus',
+    url='https://github.com/mehvix/golink',
     author='Max Vogel; Original Author: Logan Engstrom',
     author_email='max-v@berkeley.edu',
-    keywords='golinks github pages',
+    keywords='golink github pages',
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 4 - Alpha',
@@ -123,12 +123,12 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3',
     ],
-    packages=['gitlinks-plus'],
+    packages=['golink'],
     install_requires=install_requires,
     setup_requires=['pytest-runner<5.0'],
     tests_require=tests_requires,
     entry_points={
-        'console_scripts': ['gitlinks-plus=gitlinks-plus:main'],
+        'console_scripts': ['golink=golink:main'],
     },
     include_package_data=True,
     zip_safe=False,

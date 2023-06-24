@@ -8,6 +8,7 @@ import sys
 
 from setuptools import Command, setup
 
+# TODO get images working on webpage
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -37,38 +38,40 @@ with open("README.md", "r") as fh:
 
 __PATH__ = os.path.abspath(os.path.dirname(__file__))
 
+
 def read_readme():
-    with open('README.md') as f:
+    with open("README.md") as f:
         return f.read()
 
 
 install_requires = [
-    'docopt>=0.6.2',
-    'GitPython>=3.1.13',
-    'ilock>=1.0.3',
-    'pandas>=1.2.2',
-    'portalocker>=2.2.1',
-    'requests>=2.25.1',
-    'requests-toolbelt>=0.9.1',
-    'tabulate>=0.8.9',
-    'tqdm>=4.58.0',
-    'twine'
+    "docopt>=0.6.2",
+    "GitPython>=3.1.13",
+    "ilock>=1.0.3",
+    "pandas>=1.2.2",
+    "portalocker>=2.2.1",
+    "requests>=2.25.1",
+    "requests-toolbelt>=0.9.1",
+    "tabulate>=0.8.9",
+    "tqdm>=4.58.0",
+    "twine",
 ]
 
-tests_requires = [
-    'pytest<5.0'
-]
+tests_requires = ["pytest<5.0"]
 
-__version__ = str(0.4)+"plus"
+__version__ = str(0.4) + "plus"
 
 
 # brought from https://github.com/kennethreitz/setup.py
 class DeployCommand(Command):
-    description = 'Build and deploy the package to PyPI.'
+    description = "Build and deploy the package to PyPI."
     user_options = []
 
-    def initialize_options(self): pass
-    def finalize_options(self): pass
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
 
     @staticmethod
     def status(s):
@@ -89,50 +92,53 @@ class DeployCommand(Command):
 
         try:
             from shutil import rmtree
-            self.status('Removing previous builds ...')
-            rmtree(os.path.join(__PATH__, 'dist'))
+
+            self.status("Removing previous builds ...")
+            rmtree(os.path.join(__PATH__, "dist"))
         except OSError:
             pass
 
-        self.status('Building Source and Wheel (universal) distribution ...')
-        os.system('{0} setup.py sdist'.format(sys.executable))
+        self.status("Building Source and Wheel (universal) distribution ...")
+        os.system("{0} setup.py sdist".format(sys.executable))
 
-        self.status('Uploading the package to PyPI via Twine ...')
-        os.system('twine upload dist/*')
+        self.status("Uploading the package to PyPI via Twine ...")
+        os.system("twine upload dist/*")
 
-        self.status('Creating git tags ...')
-        os.system('git tag v{0}'.format(__version__))
-        os.system('git tag --list')
+        self.status("Creating git tags ...")
+        os.system("git tag v{0}".format(__version__))
+        os.system("git tag --list")
         sys.exit()
 
+
 setup(
-    name='golink',
+    name="golink",
     version=__version__,
-    license='GPLv3',
-    description='GitHub pages-powered golinks',
+    license="GPLv3",
+    description="GitHub pages-powered golinks; CLI URL aggregator.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/mehvix/golink',
-    author='Max Vogel; Original Author: Logan Engstrom',
-    author_email='max-v@berkeley.edu',
-    keywords='golink github pages',
+    url="https://github.com/mehvix/golink",
+    author="Logan Engstrom (OG Author), Max Vogel (Fork)",
+    author_email="max-v@berkeley.edu",
+    keywords="golink gitlink github-pages shortlink url-shortener",
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 4 - Alpha',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 3',
+        "Development Status :: 4 - Alpha",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
     ],
-    packages=['golink'],
+    packages=["golink"],
     install_requires=install_requires,
-    setup_requires=['pytest-runner<5.0'],
+    setup_requires=["pytest-runner<5.0"],
     tests_require=tests_requires,
     entry_points={
-        'console_scripts': ['golink=golink:main'],
+        "console_scripts": ["golink=golink:main"],
     },
     include_package_data=True,
     zip_safe=False,
     cmdclass={
-        'deploy': DeployCommand,
+        "deploy": DeployCommand,
     },
-    python_requires=">=3.6")
+    python_requires=">=3.6",
+)

@@ -1,18 +1,22 @@
-"""GitLinks: Command line client for managing GitHub pages-powered shortlinks.
-See https://github.com/lengstrom/gitlinks#setup for setup and additional usage
+"""
+GoLink: Command line client for managing GitHub pages-powered shortlinks.
+Forked from [GitLinks](https://github.com/lengstrom/gitlinks)
+See https://github.com/mehvix/golink#setup for setup and additional usage
 information.
 
 Usage:
-  gitlinks init <git_remote>
-  gitlinks set <key> <url>
-  gitlinks delete <key> ...
-  gitlinks show
-  gitlinks hide <key> ...
-  gitlinks cname <CNAME>
+  golink init <git_remote>
+  golink set <key> <url>
+  golink delete <key> ...
+  golink show
+  golink hide <key> ...
+  golink cname <CNAME>
 
 Options:
   -h --help     Show this screen.
 """
+# TODO use argparse
+
 import json
 import shutil
 import sys
@@ -29,7 +33,7 @@ from .utils import (ARROW, bolded, check_repo, clean, clone, commit_push,
                     query_yes_no, reset_origin, serialize_csv, try_setup,
                     try_state)
 
-GIT_PATH = Path('~/.gitlinks-plus/').expanduser()
+GIT_PATH = Path('~/.golink/').expanduser()
 INDEX_NAME = 'index.csv'
 META_NAME = 'state.json'
 
@@ -53,7 +57,7 @@ def initialize(url, path=GIT_PATH):
 
     repo = clone(url, path)
     try_setup(repo, path, INDEX_NAME, META_NAME)
-    pprint(f'Initialized gitlinks via {url}!')
+    pprint(f'Initialized golink via {url}!')
 
 def set_link(key, url, df):
     url = patch_url(url)
@@ -83,7 +87,7 @@ def show(df, repo):
     df = df.sort_values('key')
 
     rurl = repo.remotes.origin.url
-    title = bolded(f'== GitLinks (Remote: {rurl}) ==')
+    title = bolded(f'== golink (remote: {rurl}) ==')
     print(title)
     if df.shape[0] > 0:
         tab = tabulate.tabulate(df, df.columns, colalign=('left', 'center', 'left'),
@@ -110,7 +114,7 @@ def execute(args, git_path=GIT_PATH):
         repo = git.Repo(git_path)
         assert check_repo(repo, INDEX_NAME)
     except:
-        msg = "No initialized repo; run `gitlinks init <url>` first!"
+        msg = "No initialized repo; run `golink init <url>` first!"
         raise ValueError(msg)
 
     csv_path = git_path / INDEX_NAME
@@ -181,7 +185,8 @@ def execute(args, git_path=GIT_PATH):
 
     try:
         pprint('Committing and pushing...')
-        commit_push(repo, commit_msg[:50])
+        # presumably, this is a soft enforcement? I want link support
+        commit_push(repo, commit_msg)   # [:50]
         pprint(f'{bolded("Success")}: {print_msg}.')
     except Exception as e:
         reset_origin(repo)
@@ -193,7 +198,7 @@ def main():
         sys.argv.append('-h')
 
     args = docopt(__doc__)
-    with ILock('gitlinks'):
+    with ILock('golink'):
         execute(args)
 
 if __name__ == '__main__':

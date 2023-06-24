@@ -19,7 +19,10 @@ DEFAULT_PROTECTED = ['.git', 'CNAME']
 # m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 # })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 # """
+# TODO Google is evil; find a viable alternative. Count how many times link is clicked + display
 
+
+# TODO toggle-able darktheme
 STYLE_CSS = """
 body {{
     font-family: -apple-system, BlinkMacSystemFont, Helvetica, Segoe UI, Arial, sans-serif;
@@ -178,10 +181,10 @@ def generate_pages(df, working_dir, index_name, state):
 
     with open(wd / 'index.html', 'w+') as index_file:
         html = (f"""
-<title>gitlinks</title>
+<title>golink</title>
 <style>{STYLE_CSS}</style>
 <script defer>{SORT_JS}</script>
-<h1>gitlinks plus</h1>
+<h1>golink plus</h1>
 <table><tbody>
 <tr><th>Date Updated</th><th>Key</th><th></th><th>URL</th></tr>
 {"".join((inner_list))}

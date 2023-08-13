@@ -2,7 +2,8 @@ import csv
 
 import pandas as pd
 import regex as re
-from git import Repo
+from git.repo import Repo
+from tqdm import tqdm
 
 
 def export_commit_history(repo_path, csv_path):
@@ -14,7 +15,7 @@ def export_commit_history(repo_path, csv_path):
     df=pd.read_csv(csv_path)
     keys = set(df['key'])
 
-    for commit in commits:
+    for commit in tqdm(commits):
         if str(commit.message).startswith('Set key '):
             key = re.search(r'\"(.+?)\"', commit.message).group(1)
             if key in keys:
@@ -36,6 +37,7 @@ def add_hide_column(csv_path):
 if __name__ == "__main__":
     # `cp ~/.gitlinks/index.csv .`
     export_commit_history('~/.gitlinks/.git', 'index.csv')
-    # add_hide_column('index.csv')
+    add_hide_column('index.csv')
+    # `cp index.csv ~/.golink`
 
 

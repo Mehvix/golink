@@ -59,7 +59,7 @@ install_requires = [
 
 tests_requires = ["pytest<5.0"]
 
-__version__ = str(0.4) + "plus"
+__version__ = str(0.4) + "fork"
 
 
 # brought from https://github.com/kennethreitz/setup.py

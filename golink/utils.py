@@ -8,8 +8,9 @@ import git
 import pandas as pd
 import requests
 from git import RemoteProgress
+from git.repo import Repo
 
-ARROW = "→"
+ARROW = "⇒"
 DEFAULT_PROTECTED = [".git", "CNAME"]
 # GA = """
 # <!-- Google Analytics -->
@@ -20,38 +21,6 @@ DEFAULT_PROTECTED = [".git", "CNAME"]
 # })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 # """
 # TODO Google is evil; find a viable alternative. Count how many times link is clicked + display
-
-
-# TODO toggle-able darktheme
-STYLE_CSS = """
-body {{
-    font-family: -apple-system, BlinkMacSystemFont, Helvetica, Segoe UI, Arial, sans-serif;
-    padding: 24px;
-    line-height: 1.5;
-}}
-a {{ color: black }}
-td:nth-child(1) {{ text-align: left }}
-th  {{
-    cursor: row-resize;
-    text-align: left;
-}}
-"""
-
-# Source: https://stackoverflow.com/a/49041392
-SORT_JS = """
-const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
-
-const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
-    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-
-document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {{
-    const table = th.closest('table');
-    Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
-        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-        .forEach(tr => table.appendChild(tr) );
-}})));
-"""
 
 
 def try_state(git_path, meta_name):
@@ -88,11 +57,12 @@ class CloneProgress(RemoteProgress):
     def update(self, op_code, cur_count, max_count=None, message=""):
         if message:
             print(message)
+        return super().update(op_code, cur_count, max_count, message)
 
 
-def clone(url, path: Path) -> git.Repo:
+def clone(url, path: Path) -> Repo:
     prog = CloneProgress()
-    return git.Repo.clone_from(url, path, progress=prog)
+    return Repo.clone_from(url, path, progress=prog)
 
 
 def commit_push(repo, commit_msg):
@@ -128,7 +98,7 @@ def wipe_directory(dired, protected):
                 child.unlink()
 
 
-def try_setup(repo: git.Repo, path: Path, index_name, state_name):
+def try_setup(repo: Repo, path: Path, index_name, state_name):
     # path is the path of a git repository
     # Clean up any non-tracked changes
     # Then check if there's an index.csv; if so, exit
@@ -167,7 +137,7 @@ def prettify_list(ls, bold=True):
     return ", ".join(map(func, ls))
 
 
-def generate_pages(df, working_dir, index_name, state):
+def generate_pages(df, working_dir, index_name, state, rurl=None):
     wd = Path(working_dir)
     if "CNAME" in state:
         cname = state["CNAME"]
@@ -197,16 +167,33 @@ def generate_pages(df, working_dir, index_name, state):
                 f'<tr><td>{date}</td><td><a href="{key}">{key}</a></td><td>{ARROW}</td><td><a href="{url}">{url}</a></td></li>\n'
             )
 
+    css_file = Path("./style.css")
+    assert css_file.is_file()
+    css_txt = css_file.read_text()
+
+    js_file = Path("./script.js")
+    assert js_file.is_file()
+    js_txt = js_file.read_text()
+
+    # hacky
+    parse_rurl = lambda x: x.replace("git@github.com:", "https://github.com/")[:-4]
+
     with open(wd / "index.html", "w+") as index_file:
         html = f"""
 <title>golink</title>
-<style>{STYLE_CSS}</style>
-<script defer>{SORT_JS}</script>
-<h1>golink plus</h1>
+<style>{css_txt}</style>
+<header>
+<span>
+<h1><a class="rem" href='https://github.com/Mehvix/golink'>golink</a></h1>
+{"" if rurl is None else f'<a class="rem" href="{parse_rurl(rurl)}">remote</a>'}
+</span>
+<div><input type="checkbox" class="btn-toggle" id="toggle"><label for="toggle"><i></i></label></div>
+</header>
 <table><tbody>
 <tr><th>Date Updated</th><th>Key</th><th></th><th>URL</th></tr>
 {"".join((inner_list))}
-</tbody></table>"""
+</tbody></table>
+<script>{js_txt}</script>"""
         # if prop_id:
         #     html = html + GA.format(prop_id)
 

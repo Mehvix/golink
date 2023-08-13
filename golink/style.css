@@ -1,0 +1,209 @@
+:root {
+    color-scheme: light dark;
+
+    --mono-0: #c8cbd6;
+    --mono-1: #abb2bf;
+    --mono-2: #828997;
+    --mono-3: #5c6370;
+
+    --hue-1: #56b6c2;
+    --hue-2: #61afef;
+    --hue-3: #c678dd;
+    --hue-4: #98c379;
+    --hue-5: #e06c75;
+    --hue-5-2: #be5046;
+    --hue-6: #d19a66;
+    --hue-6-2: #e5c07b;
+
+    --bg: #282c34;
+    --gutter: #636d83;
+    --guide: #abb2bf;
+    --accent: #528bff;
+
+    /* extra */
+    --fg: #4b5263;
+    --bg-light: #282c34;
+    --bg-dark: #21252b;
+    --bg-darker: #1d1f23;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica, Segoe UI, Arial, sans-serif;
+    padding: 24px;
+    line-height: 1.5;
+}
+
+table {
+    border-spacing: 10px 2px;
+}
+
+td {
+    white-space: nowrap;
+}
+
+td:nth-child(1) {
+    text-align: left
+}
+
+th {
+    cursor: row-resize;
+    text-align: center;
+}
+
+th:last-child {
+    text-align: left;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    background-color: inherit;
+    position: sticky;
+    top: 0;
+    padding: 10px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 200%;
+}
+
+h1,
+a.rem,
+th {
+    color: var(--bold-color);
+    font-variant: small-caps;
+    font-style: italic;
+    font-weight: bold;
+}
+
+th {
+    font-size: 115%;
+
+    user-select: none;
+    /* Prevent text selection */
+    cursor: default;
+    /* Change cursor to default */
+    -moz-user-select: none;
+    /* For Firefox */
+    -webkit-user-select: none;
+    /* For Chrome, Safari, and Opera */
+    -ms-user-select: none;
+    /* For Internet Explorer/Edge */
+}
+
+th.active {
+    text-decoration: underline;
+}
+
+/* === Dark Theme === */
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+body {
+    --bold-color: #000;
+    --text-color: #222;
+    --bkg-color: #fff;
+}
+
+body.dark-theme {
+    --bold-color: var(--mono-0);
+    --text-color: var(--mono-1);
+    --bkg-color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+
+    body {
+        --bold-color: var(--mono-0);
+        --text-color: var(--mono-1);
+        --bkg-color: var(--bg);
+    }
+
+    body.light-theme {
+        --bold-color: #000;
+        --text-color: #222;
+        --bkg-color: #fff;
+    }
+}
+
+body {
+    background: var(--bkg-color);
+}
+
+a.rem,
+h1,
+th {
+    color: var(--bold-color);
+}
+
+table,
+p {
+    color: var(--text-color);
+}
+
+
+/* === Slider Button === */
+
+label {
+    display: block;
+    width: 54px;
+    height: 32px;
+    margin: 0px auto;
+    border-radius: 100px;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+    background-color: var(--gutter);
+}
+
+input {
+    display: none;
+}
+
+
+/* The toggle */
+
+i {
+    height: 28px;
+    width: 28px;
+    background: #ffffff;
+    display: inline-block;
+    border-radius: 100px;
+    margin-top: 2px;
+    margin-left: 2px;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+    pointer-events: none;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+label:hover>i {
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.20);
+    transform: scale(1.01);
+}
+
+input:checked+label>i {
+    margin-left: 24px;
+}
+
+label:active {
+    background-color: var(--gutter);
+}
+
+label:active>i {
+    width: 34px;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.20);
+}
+
+input:checked+label:active>i {
+    margin-left: 18px;
+}
+
+input:checked+label {
+    background-color: var(--accent);
+}

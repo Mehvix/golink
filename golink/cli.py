@@ -26,26 +26,12 @@ import git
 import pandas as pd
 import tabulate
 from docopt import docopt
+from git.repo import Repo
 from ilock import ILock
-
-from .utils import (
-    ARROW,
-    bolded,
-    check_repo,
-    clean,
-    clone,
-    commit_push,
-    generate_pages,
-    load_csv,
-    patch_url,
-    plural_msg,
-    pprint,
-    query_yes_no,
-    reset_origin,
-    serialize_csv,
-    try_setup,
-    try_state,
-)
+from utils import (ARROW, bolded, check_repo, clean, clone, commit_push,
+                   generate_pages, load_csv, patch_url, plural_msg, pprint,
+                   query_yes_no, reset_origin, serialize_csv, try_setup,
+                   try_state)
 
 GIT_PATH = Path("~/.golink/").expanduser()
 INDEX_NAME = "index.csv"
@@ -78,6 +64,14 @@ def initialize(url, path=GIT_PATH):
     pprint(f"Initialized golink via {url}!")
 
 
+def migrate():
+    """
+    Migrate from GitLinks to GoLink.
+    """
+    # TODO
+    raise NotImplementedError
+
+
 def set_link(key, url, df):
     url = patch_url(url)
     datetime = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -107,6 +101,7 @@ def hide_links(keys, df):
 
 
 def show(df, repo):
+    # TODO fix this
     df[ARROW] = [ARROW for _ in range(df.shape[0])]
     new_order = [0, 2, 1]
     df = df[df.columns[new_order]]
@@ -139,7 +134,7 @@ def execute(args, git_path=GIT_PATH):
         return initialize(args["<git_remote>"], path=git_path)
 
     try:
-        repo = git.Repo(git_path)
+        repo = Repo(path=git_path)
         assert check_repo(repo, INDEX_NAME)
     except:
         msg = "No initialized repo; run `golink init <url>` first!"
@@ -209,11 +204,13 @@ def execute(args, git_path=GIT_PATH):
         cname = None
 
     serialize_csv(df, csv_path)
-    generate_pages(df, git_path, INDEX_NAME, get_state())
+
+    git_remote_url = repo.remotes.origin.url
+    generate_pages(df, git_path, INDEX_NAME, get_state(), rurl=git_remote_url)
 
     try:
         pprint("Committing and pushing...")
-        # presumably, this is a soft enforcement? I want link support
+        # presumably, this is a soft enforcement? I want links to not be cut off
         commit_push(repo, commit_msg)  # [:50]
         pprint(f'{bolded("Success")}: {print_msg}.')
     except Exception as e:

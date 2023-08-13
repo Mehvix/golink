@@ -1,3 +1,7 @@
+[project]
+name = "golink"
+version = "0.4.0"
+
 [build-system]
 requires = [
     "setuptools>=42",

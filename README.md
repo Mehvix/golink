@@ -98,8 +98,8 @@ After this step, you should be able to make go-links to your heart's content.
 
 # todos
 
-- [ ] Dark theme (OneDark?)
-- [ ] Migration CLI function
+- [x] Dark theme (OneDark?)
+- [x] Migration CLI function
 - [ ] Faster forwarding?
 - [ ] Better arg parsing
 - [ ] Mobile support

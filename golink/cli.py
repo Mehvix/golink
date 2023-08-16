@@ -6,6 +6,7 @@ information.
 
 Usage:
   golink init <git_remote>
+  golink migrate
   golink set <key> <url>
   golink delete <key> ...
   golink show
@@ -18,6 +19,7 @@ Options:
 # TODO use argparse
 
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -50,26 +52,70 @@ def set_state(k, v):
     return state
 
 
+def rm_dir(path, msg) -> bool:
+    if query_yes_no(msg, default="yes"):
+        shutil.rmtree(path)
+        return True
+    else:
+        pprint("Ok, exiting.")
+        return False
+
+
 def initialize(url, path=GIT_PATH):
-    if path.exists():
-        msg = f"{path} already exists; really delete?"
-        if query_yes_no(msg, default="yes"):
-            shutil.rmtree(path)
-        else:
-            pprint("Ok, exiting.")
-            return
+    if path.exists() and not rm_dir(path, msg=f"{path} already exists; re-init and delete?"):
+        return
 
     repo = clone(url, path)
     try_setup(repo, path, INDEX_NAME, META_NAME)
     pprint(f"Initialized golink via {url}!")
 
 
-def migrate():
+def migrate(path_from="~/.gitlinks", path_to=GIT_PATH):
     """
     Migrate from GitLinks to GoLink.
     """
-    # TODO
-    raise NotImplementedError
+    path_from = Path(path_from).expanduser()
+    path_to = Path(path_to).expanduser()
+
+    if path_to.exists() and not rm_dir(path_to, msg=f"{path_to} already exists; really migrate and clean (delete) here?"):
+        return
+
+    # copy
+    shutil.copytree(path_from, path_to)
+
+    repo = Repo(path=path_to)
+    git_remote_url = repo.remotes.origin.url
+    commits = list(repo.iter_commits())[::-1]
+
+    csv_path = path_to / INDEX_NAME
+    df = load_csv(csv_path)
+
+    # add date column, based on git commit information
+    keys = set(df['key'])
+    # for commit in tqdm(commits):
+    for commit in commits:
+        if str(commit.message).startswith('Set key '):
+            key = re.search(r'\"(.+?)\"', commit.message).group(1)
+            if key in keys:
+                df.loc[df['key'] == key, 'date'] = commit.committed_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+    # create hide column; init to False
+    df['hide'] = False
+    df.to_csv(csv_path, index=False)
+
+    serialize_csv(df, csv_path)
+
+    generate_pages(df, path_to, INDEX_NAME, get_state(), rurl=git_remote_url)
+
+    try:
+        pprint("Committing and pushing...")
+        # presumably, this is a soft enforcement? I want links to not be cut off
+        commit_push(repo, "Migrating from GitLinks to GoLink.")  # [:50]
+        pprint(f'{bolded("Success")}: Migration succeeded.')
+    except Exception as e:
+        reset_origin(repo)
+        pprint(f"Failed; rolling back.")
+        raise e
 
 
 def set_link(key, url, df):
@@ -132,6 +178,8 @@ def show(df, repo):
 def execute(args, git_path=GIT_PATH):
     if args["init"]:
         return initialize(args["<git_remote>"], path=git_path)
+    if args["migrate"]:
+        return migrate(path_to=git_path)
 
     try:
         repo = Repo(path=git_path)

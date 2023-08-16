@@ -136,6 +136,9 @@ setup(
         "console_scripts": ["golink=golink:main"],
     },
     include_package_data=True,
+    package_data={
+        '': ['script.js', 'style.css'],
+    },
     zip_safe=False,
     cmdclass={
         "deploy": DeployCommand,

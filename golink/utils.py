@@ -167,11 +167,14 @@ def generate_pages(df, working_dir, index_name, state, rurl=None):
                 f'<tr><td>{date}</td><td><a href="{key}">{key}</a></td><td>{ARROW}</td><td><a href="{url}">{url}</a></td></li>\n'
             )
 
-    css_file = Path("./style.css")
+    current_file_path = Path(__file__)
+    package_path = current_file_path.parent
+
+    css_file = package_path / "style.css"
     assert css_file.is_file()
     css_txt = css_file.read_text()
 
-    js_file = Path("./script.js")
+    js_file = package_path / "script.js"
     assert js_file.is_file()
     js_txt = js_file.read_text()
 

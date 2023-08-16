@@ -30,10 +30,11 @@ import tabulate
 from docopt import docopt
 from git.repo import Repo
 from ilock import ILock
-from utils import (ARROW, bolded, check_repo, clean, clone, commit_push,
-                   generate_pages, load_csv, patch_url, plural_msg, pprint,
-                   query_yes_no, reset_origin, serialize_csv, try_setup,
-                   try_state)
+
+from .utils import (ARROW, bolded, check_repo, clean, clone, commit_push,
+                    generate_pages, load_csv, patch_url, plural_msg, pprint,
+                    query_yes_no, reset_origin, serialize_csv, try_setup,
+                    try_state)
 
 GIT_PATH = Path("~/.golink/").expanduser()
 INDEX_NAME = "index.csv"

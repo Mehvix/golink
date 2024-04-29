@@ -8,7 +8,7 @@ Usage:
   golink init <git_remote>
   golink migrate
   golink set <key> <url>
-  golink delete <key> ...
+  golink rm <key> ...
   golink show
   golink hide <key> ...
   golink cname <CNAME>
@@ -207,7 +207,7 @@ def execute(args, git_path=GIT_PATH):
         df = set_link(key, url, df)
         print_msg = f'Set key "{bolded(key)}" {bolded(ARROW)} "{bolded(url)}"'
         commit_msg = f'Set key "{key}" {ARROW} "{url}"'
-    elif args["delete"]:
+    elif args["rm"]:
         keys = args["<key>"]
         poss = set(df.key)
         deletable = [k for k in keys if k in poss]
@@ -218,7 +218,7 @@ def execute(args, git_path=GIT_PATH):
             msg = "Key{plural} {keys_pretty} not present..."
             pprint(plural_msg(not_deletable, msg))
 
-        msg = "Deleted key{plural} {keys_pretty}"
+        msg = "Removed key{plural} {keys_pretty}"
         print_msg = plural_msg(deletable, msg, bold=True)
         commit_msg = plural_msg(deletable, msg, bold=False)
 

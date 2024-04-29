@@ -59,7 +59,7 @@ install_requires = [
 
 tests_requires = ["pytest<5.0"]
 
-__version__ = str(0.4) + "fork"
+__version__ = str(0.5 + 0.01)
 
 
 # brought from https://github.com/kennethreitz/setup.py
@@ -80,8 +80,9 @@ class DeployCommand(Command):
     def run(self):
         import twine  # we require twine locally
 
-        assert 'dev' not in __version__, \
-            "Only non-devel versions are allowed. __version__ == {}".format(__version__)
+        assert (
+            "dev" not in __version__
+        ), "Only non-devel versions are allowed. __version__ == {}".format(__version__)
 
         with os.popen("git status --short") as fp:
             git_status = fp.read().strip()
@@ -137,7 +138,7 @@ setup(
     },
     include_package_data=True,
     package_data={
-        '': ['script.js', 'style.css'],
+        "": ["script.js", "style.css"],
     },
     zip_safe=False,
     cmdclass={

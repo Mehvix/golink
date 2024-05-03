@@ -1,2 +1,0 @@
-- name: Publish python poetry package
-  uses: JRubics/poetry-publish@v2.0

@@ -1,95 +1,92 @@
-# `gitlinks` - Git Powered Go-Links
+# `golink` - git powered go-links
 <p align = 'center'>
-    Hosted "<a href="https://yiou.me/blog/posts/google-go-link">Go-Links</a>" via Git and <a href="https://pages.github.com">GitHub Pages</a>
+    Host your own "<a href="https://yiou.me/blog/posts/google-go-link">go-links</a>" via git and <a href="https://pages.github.com">github pages</a>
     <br/>
-    <code>pip install gitlinks</code>
+    <code>pip install golink</code>
     <br/>
     <p align = 'center'>
-    <img src="static/demo.gif"/>
+    <img src="https://raw.githubusercontent.com/Mehvix/golink/master/.github/assets/demo.gif"/>
     </p>
 </p>
 
-# Quick Overview
 
-`gitlinks` is a command line tool that maps custom shortlinks to URLs via
-[Git](https://git-scm.com) and [GitHub Pages](https://pages.github.com) .
-The following table shows example mappings for user `lengstrom`'s gitlinks repository
-[goto](https://github.com/lengstrom/goto):
+**What:** `golink` is a command line tool that maps custom shortlinks to URLs via
+[Git](https://git-scm.com) and [GitHub Pages](https://pages.github.com). This free software is licensed under GPLv3 and is a fork of [gitlink](https://github.com/lengstrom/gitlinks).
 
-| Key           | URL                                 | GitHub Pages Shortlink                    |
-| :------------ | :---------------------------------- | :---------------------------------------- |
-| `zoom`        | https://mit.zoom.us/j/95091088705   | http://loganengstrom.com/goto/zoom        |
-| `classes/NLP` | https://canvas.mit.edu/courses/7503 | http://loganengstrom.com/goto/classes/nlp |
 
-Here, anyone can access the
-`zoom` link https://mit.zoom.us/j/95091088705 at http://loganengstrom.com/goto/
-(since the GitHub pages site `lengstrom.github.io` maps to `loganengstrom.com`).
-We can also organize keys through nesting, such as with `classes/NLP`.
-
-`gitlinks` works by [storing state on GitHub](https://github.com/lengstrom/goto/blob/main/index.csv)
+**How:** `golink` works by [storing state on GitHub](https://github.com/lengstrom/goto/blob/main/index.csv)
 and [rendering structured redirects on GitHub pages](https://github.com/lengstrom/goto). Add, remove, and visualize link mappings through the command line!
 
+
+## Commands
 ```
-$ gitlinks set zoom https://mit.zoom.us/j/95091088705
+$ golink set zoom https://mit.zoom.us/j/95091088705
   => Success: Set key "zoom" → "https://mit.zoom.us/j/95091088705".
 ```
 ```
-$ gitlinks delete zoom
-  => Success: Deleted key "zoom".
+$ golink hide zoom
+  => Success: Removed key "zoom".
 ```
 ```
-$ gitlinks show
+$ golink show
 => Checking for changes from remote...
-== GitLinks (Remote: git@github.com:lengstrom/goto.git) ==
+== golink (Remote: git@github.com:lengstrom/goto.git) ==
 calendly                 →   https://calendly.com/loganengstrom
 classes/18.102           →   http://math.mit.edu/~rbm/18-102-S17/
 classes/6.005            →   http://web.mit.edu/6.031/www/fa18/general/
 ffcv_slack               →   https://ffcv-workspace.slack.com/join/shared_invite/zt-11olgvyfl-dfFerPxlm6WtmlgdMuw_2A#/shared-invite/email
 papers/bugsnotfeatures   →   https://arxiv.org/abs/1905.02175
 zombocom                 →   https://www.zombo.com
-zoom                     →   https://mit.zoom.us/j/95091088705
+zoom                     →   https://mit.zoom.us/j/95091088705c
 ```
+<!-- TODO upd this output, and gif -->
 
-`gitlinks` also generates an index page: see
-http://loganengstrom.com/goto/ as an example. The big caveat of `gitlinks` is that <b>all of your links are public to anyone on the web</b>, so be careful with what you link!
 
 # Setup
 
-Configure `gitlinks` in two steps!
+Configure `golink` in two steps!
 
 ## Set-up GitHub Repository
 
-First, visit https://github.com/new and choose a short, memorable name like
-`go` for your gitlinks repository.
+First, visit https://github.com/new and choose a short, memorable name like `go` for your golink repository.
 
-![](static/make_repo.png)
+<!-- . -->
+![](https://raw.githubusercontent.com/Mehvix/golink/master/.github/assets/make_repo.png)
 
 Now, check the box "Add a README file" (the repository can't be empty).
 
-![](static/add_readme.png)
+![](https://raw.githubusercontent.com/Mehvix/golink/master/.github/assets/add_readme.png)
 
-Make the repository, then go your repository's GitHub pages settings:
-`https://github.com/yourusername/repository_name/settings/pages` and **enable GitHub pages** for the `main` branch:
+Make the repository, then go your repository's GitHub pages settings: `https://github.com/<USERNAME>/go/settings/pages` and **enable GitHub pages** for the `master`/`main` branch:
 
-![](static/enable_ghpages.png)
+![](https://raw.githubusercontent.com/Mehvix/golink/master/.github/assets/enable_ghpages.png)
 
-## Initialize `gitlinks` locally
+## Install `golink`
 
 ### pip
 
-Install the `gitlinks` executable via `pip`: `pip install gitlinks`. Then,
-initialize `gitlinks` to use your repository: `gitlinks init remote_url`.
-Your `remote_url` can be found here:
-
-![](static/remote_url.png)
-
-### manual, with [pipx](https://pypa.github.io/pipx/)
-
+```sh
+pip install golink
 ```
+
+### [pipx](https://pypa.github.io/pipx/)
+
+```sh
 git clone https://github.com/Mehvix/golink.git
 cd golink
 pipx install .
 ```
+
+## Initialize `golink`
+
+
+```sh
+golink init <remote_url>
+```
+
+Your `<remote_url>` can be found here:
+
+![](https://raw.githubusercontent.com/Mehvix/golink/master/.github/assets/remote_url.png)
 
 ---
 
@@ -101,8 +98,7 @@ After this step, you should be able to make go-links to your heart's content.
 - [x] Dark theme (OneDark?)
 - [x] Migration CLI function
 - [ ] Faster forwarding?
-- [ ] Better arg parsing
+- [ ] Proper arg parsing
 - [ ] Mobile support
-
-# License
-GPL v3
+- [ ] Silly header
+- [ ] Forward link metadata

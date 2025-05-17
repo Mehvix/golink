@@ -2,9 +2,6 @@
 name = "golink"
 package = "golink"
 
-entry-points = ["golink = golink.cli:main"]
-
-
 [tool.poetry]
 name = "golink"
 version = "0.5.8"

@@ -4,7 +4,7 @@ package = "golink"
 
 [tool.poetry]
 name = "golink"
-version = "0.5.8"
+version = "0.5.9"
 license = "GPLv3"
 description = "A simple URL shortener"
 authors = ["Max Vogel", "Logan Engstrom"]
